@@ -1,19 +1,4 @@
-﻿// ================================================================
-//  SECURITY CONFIGURATION
-// ================================================================
-
-
-
-
-// ================================================================
-//  CONFIG — CHANGE THESE VALUES BEFORE GOING LIVE
-// ================================================================
-
-// Supabase config is loaded from supabase-config.js into:
-//   window.SUPABASE_URL
-//   window.SUPABASE_ANON_KEY
-// This file intentionally does not hardcode keys.
-const SUPABASE_URL = (window.SUPABASE_URL || "").trim();
+﻿const SUPABASE_URL = (window.SUPABASE_URL || "").trim();
 const SUPABASE_ANON_KEY = (window.SUPABASE_ANON_KEY || "").trim();
 
 function getSupabase() {

@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- ============================================================
-     REVOLUTION 2.0 — GSCCC National Cultural Event Portal
-     Built for: Govt. Science College Cultural Club, Dhaka
-     ============================================================ -->
 <title>Revolution 2.0 — GSCCC</title>
 <style>
-  /* ── Loading screen — critical inline CSS ── */
+  /* Loading screen */
   #loading-screen {
     position: fixed;
     inset: 0;
@@ -64,7 +60,7 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- ===== LOADING SCREEN ===== -->
+<!-- LOADING SCREEN -->
 <div id="loading-screen">
   <div id="ls-logo-wrap">
     <img id="ls-rev" alt="Revolution">
@@ -77,16 +73,16 @@
 <script src="assets/assets.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<!-- ===== CURSOR (desktop only) ===== -->
+<!-- CURSOR (desktop only) -->
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
-<!-- ===== CURSOR NAV HINT ===== -->
+<!-- CURSOR NAV HINT -->
 <div id="cursor-nav-hint"></div>
 
-<!-- ===== PARTICLES ===== -->
+<!-- PARTICLES -->
 <canvas id="particles-canvas"></canvas>
 
-<!-- ===== NAVBAR ===== -->
+<!-- NAVBAR -->
 <nav class="navbar" id="navbar">
   <a href="#" class="nav-logo" data-page="home">
     <img id="nl-rev" alt="Revolution" class="logo-rev">
@@ -113,7 +109,7 @@
   </div>
 </nav>
 
-<!-- ===== MOBILE MENU ===== -->
+<!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobile-menu">
   <a href="#" class="m-link" data-page="home">Home</a>
   <a href="#" class="m-link" data-page="segments">Segments</a>
@@ -128,7 +124,7 @@
   </div>
 </div>
 
-<!-- ===== CLUB LOGO BUTTON (bottom-right) ===== -->
+<!-- CLUB LOGO BUTTON (bottom-right) -->
 <button class="club-logo-btn" id="club-logo-btn" aria-label="About GSCCC" title="About GSCCC">
   <img id="club-logo-img" alt="GSCCC">
   <span class="club-logo-pulse"></span>
@@ -148,7 +144,7 @@
   </div>
 </div>
 
-<!-- ===== TOAST ===== -->
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <div id="page-home" class="page active">
@@ -165,7 +161,7 @@
             <img id="hs-20"  alt="2.0"        class="logo-20">
           </div>
           <!-- CHANGE THIS: Update subtitle text -->
-          <p class="hero-sub"><strong><span style="color:#bebebe;">"The Legacy Lives On – From Resilience to Renaissance"</span></strong><br><span style="color:#bebebe;">Govt. Science College Cultural Club</span> – GSCCC proudly presents <strong>Revolution 2.0</strong></p>
+          <p class="hero-sub"><strong><span style="color:#bebebe;">"The Legacy Lives On – From Resilience to Renaissance"</span></strong><br><span style="color:#bebebe;">Govt. Science College Cultural Club</span> – GSCCC proudly presents <strong style="color:#CC1B1B;">'Revolution 2.0'</strong></p>
           <div class="hero-btns">
             <a href="#" class="btn btn-primary" data-page="register"><i class="fas fa-bolt"></i> Register Now</a>
             <a href="#" class="btn btn-ghost"   data-page="segments">View Segments</a>
@@ -237,7 +233,6 @@
 
 <!-- ABOUT -->
 <section class="about-section">
-  <!-- CHANGE THIS: Update the about quote text -->
   <div class="about-quote reveal">  
     Revolution 2.0 is the awakening of a generation that redefined courage. We transform the echoes of resistance into a celebration of art and identity. Join us as we bridge the gap between resilience and a new renaissance.
   </div>
