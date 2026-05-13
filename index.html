@@ -57,7 +57,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <!-- LOADING SCREEN -->
@@ -515,6 +514,10 @@
         <label class="form-label">Additional Note</label>
         <textarea class="form-textarea" id="f-note" placeholder="Anything you'd like us to know..."></textarea>
       </div>
+      <!-- Honeypot anti-spam (invisible to users, bots fill it) -->
+      <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
+        <input type="text" name="website" id="f-honeypot" tabindex="-1" autocomplete="off">
+      </div>
       <div class="form-submit full">
         <p>By registering you agree to our rules &amp; code of conduct.</p>
         <button class="btn btn-primary" id="submit-btn" onclick="submitForm()">
@@ -840,5 +843,6 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="script.js"></script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");</script>
 </body>
 </html>

@@ -336,6 +336,7 @@ function showPage(name) {
   if (name === "control-panel") initCP();
   if (name === "segments")      buildSegDetailGrid();
   if (name === "home")          buildHomeSegGrid();
+  if (name === "register")      restoreFormDraft();
   initReveal(); initCardReveal();
   if (window._bindCursor) window._bindCursor();
 
@@ -364,6 +365,7 @@ window.addEventListener("popstate", e => {
   if (name === "control-panel") initCP();
   if (name === "segments")      buildSegDetailGrid();
   if (name === "home")          buildHomeSegGrid();
+  if (name === "register")      restoreFormDraft();
   initReveal(); initCardReveal();
   if (window._bindCursor) window._bindCursor();
 
@@ -943,6 +945,38 @@ async function generateInvoice(registrationData) {
 }
 
 
+function saveFormDraft() {
+  const data = {};
+  document.querySelectorAll("#page-register input:not([type=file]):not([type=checkbox]):not([type=hidden]), #page-register textarea, #page-register select").forEach(e => data[e.id] = e.value);
+  document.querySelectorAll("#seg-checkbox-grid input[type=checkbox]").forEach(cb => data["cb_" + cb.value] = cb.checked);
+  localStorage.setItem("regFormDraft", JSON.stringify(data));
+}
+
+function restoreFormDraft() {
+  try {
+    const raw = localStorage.getItem("regFormDraft");
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    Object.keys(data).forEach(key => {
+      if (key.startsWith("cb_")) {
+        const cb = document.querySelector(`#seg-checkbox-grid input[value="${key.slice(3)}"]`);
+        if (cb) cb.checked = data[key];
+      } else {
+        const el = document.getElementById(key);
+        if (el) el.value = data[key];
+      }
+    });
+    updateSegmentUI();
+  } catch(_) {}
+}
+
+document.addEventListener("input", e => {
+  if (e.target.closest("#page-register")) saveFormDraft();
+});
+document.addEventListener("change", e => {
+  if (e.target.closest("#page-register")) saveFormDraft();
+});
+
 async function submitForm() {
 
   if (window._isSubmitting) return;
@@ -952,6 +986,20 @@ async function submitForm() {
   if (!sb) {
     window._isSubmitting = false;
     showToast("⚠️ Supabase is not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.", "error");
+    return;
+  }
+
+  const hp = document.getElementById("f-honeypot");
+  if (hp && hp.value.trim()) {
+    window._isSubmitting = false;
+    showToast("❌ Bot detected.", "error");
+    return;
+  }
+
+  const lastSubmit = parseInt(localStorage.getItem("lastSubmit") || "0");
+  if (Date.now() - lastSubmit < 10000) {
+    window._isSubmitting = false;
+    showToast("⚠️ Please wait 10 seconds between submissions.", "error");
     return;
   }
 
@@ -1067,6 +1115,8 @@ async function submitForm() {
     const micW  = document.getElementById("cat-mic-wrap");  if (micW)  micW.style.display  = "none";
     const totW  = document.getElementById("total-amount-wrap"); if (totW) totW.style.display = "none";
     if (document.getElementById("f-cat-mic"))  document.getElementById("f-cat-mic").value  = "";
+    localStorage.setItem("lastSubmit", Date.now());
+    localStorage.removeItem("regFormDraft");
   } catch (err) {
     // Cleanup orphaned screenshot so storage stays clean
     if (screenshotUrl) {
