@@ -13,12 +13,20 @@ html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
   --ease:cubic-bezier(0.4,0,0.2,1);
 }
 
+@font-face {
+  font-family: 'LiMehdi';
+  src: url('assets/MehdiEkushey.ttf') format('truetype');
+  font-display: swap;
+}
+
+.bn {
+  font-family: 'LiMehdi', sans-serif;
+}
+
 body{
   font-family:var(--font-b);background:var(--bg);color:var(--text);
   line-height:1.6;overflow-x:hidden;
 }
-/* cursor:none is added via JS only on non-touch devices */
-/* Force-hide default cursor on all elements for non-touch desktop */
 body.no-touch,
 body.no-touch *{
   cursor:none !important;
@@ -43,13 +51,32 @@ button{border:none;background:none;font-family:inherit}
 ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--accent-light)}
 
-/* ====== CURSOR — complete redesign (desktop only) ====== */
+/* ====== GPU COMPOSITING — promote fixed/animated elements to their
+   own compositor layer so they never trigger a repaint of scrolling
+   page content behind them. Applied globally (desktop + mobile).  ====== */
+#particles-canvas,
+.navbar,
+.club-logo-btn,
+.club-popover,
+.mobile-menu,
+#cursor,
+#cursor-ring,
+#cursor-nav-hint,
+#loading-screen,
+.toast,
+.swipe-hint {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* ====== CURSOR ====== */
 #cursor{
   position:fixed;pointer-events:none;z-index:10000;top:0;left:0;
   width:8px;height:8px;
   background:var(--accent-light);
   border-radius:50%;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%) translateZ(0);
   box-shadow:0 0 0 2px rgba(255,51,51,0.15), 0 0 12px rgba(204,27,27,0.7), 0 0 28px rgba(204,27,27,0.25);
   transition:width .15s var(--ease),height .15s var(--ease),opacity .18s,box-shadow .2s;
   will-change:left,top;
@@ -66,7 +93,7 @@ button{border:none;background:none;font-family:inherit}
   width:42px;height:42px;
   border:1px solid rgba(201,168,76,0.35);
   border-radius:50%;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%) translateZ(0);
   background: radial-gradient(circle at 35% 35%, rgba(201,168,76,0.04), transparent 60%);
   box-shadow:0 0 0 0 transparent, inset 0 0 8px rgba(201,168,76,0.05);
   transition:width .22s var(--ease),height .22s var(--ease),opacity .2s,
@@ -82,10 +109,9 @@ button{border:none;background:none;font-family:inherit}
 }
 #cursor-ring.hero-zone{ opacity:0; }
 
-/* ── Hero nav hint — the full arrow cursor replacement ── */
 #cursor-nav-hint{
   position:fixed;pointer-events:none;z-index:899;top:0;left:0;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%) translateZ(0);
   width:72px;height:72px;
   border-radius:50%;
   display:flex;align-items:center;justify-content:center;
@@ -126,7 +152,7 @@ button{border:none;background:none;font-family:inherit}
 .club-logo-btn:hover{
   border-color:rgba(204,27,27,0.7);
   box-shadow:0 6px 32px rgba(204,27,27,0.25);
-  transform:translateY(-2px);
+  transform:translateY(-2px) translateZ(0);
 }
 .club-logo-btn img{
   width:32px;height:32px;object-fit:contain;
@@ -153,13 +179,13 @@ button{border:none;background:none;font-family:inherit}
   border-radius:16px;backdrop-filter:blur(24px);
   box-shadow:0 20px 60px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.03);
   padding:1.6rem;
-  opacity:0;transform:translateY(12px) scale(0.97);
+  opacity:0;transform:translateY(12px) scale(0.97) translateZ(0);
   pointer-events:none;
   transition:opacity .28s var(--ease),transform .28s var(--ease);
   transform-origin:bottom right;
 }
 .club-popover.open{
-  opacity:1;transform:translateY(0) scale(1);pointer-events:all;
+  opacity:1;transform:translateY(0) scale(1) translateZ(0);pointer-events:all;
 }
 .club-popover-inner{position:relative;text-align:center}
 .club-popover-close{
@@ -246,7 +272,6 @@ button{border:none;background:none;font-family:inherit}
 
 .nav-right{display:flex;align-items:center;gap:1rem}
 
-/* Social icons — desktop */
 .social-icons{display:flex;gap:.6rem;align-items:center}
 .social-icon{
   display:flex;align-items:center;justify-content:center;
@@ -264,7 +289,6 @@ button{border:none;background:none;font-family:inherit}
 .social-icon:hover i{transform:scale(1.1)}
 .social-icon:hover{border-color:var(--accent);box-shadow:0 0 18px rgba(204,27,27,0.4);transform:translateY(-2px)}
 
-/* Hamburger */
 .hamburger{
   display:none;flex-direction:column;gap:5px;padding:8px;
   background:none;border:none;cursor:pointer;z-index:1001;
@@ -281,24 +305,22 @@ button{border:none;background:none;font-family:inherit}
 .mobile-menu{
   position:fixed;inset:0;background:rgba(6,0,0,0.97);backdrop-filter:blur(20px);
   z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:2.2rem;opacity:0;pointer-events:none;transform:translateY(-16px);
+  gap:2.2rem;opacity:0;pointer-events:none;transform:translateY(-16px) translateZ(0);
   transition:all .4s var(--ease);
 }
-.mobile-menu.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.mobile-menu.open{opacity:1;pointer-events:all;transform:translateY(0) translateZ(0)}
 .mobile-menu .m-link{
   font-family:"ZCOOL QingKe HuangYou", sans-serif;font-size:2.2rem;letter-spacing:3px;font-weight:600;text-transform:uppercase;
   color:var(--text-muted);transition:color .2s;
 }
 .mobile-menu .m-link:hover{color:var(--accent-light)}
 
-/* Social icons in mobile menu — properly centered row */
 .mobile-social{
   display:flex;gap:1.2rem;align-items:center;justify-content:center;
   margin-top:1rem;
 }
 .mobile-social .social-icon{
   width:44px;height:44px;font-size:1.1rem;flex-shrink:0;
-  /* Override desktop transform so they don't jitter on touch */
   transform:none !important;
 }
 .mobile-social .social-icon:hover{transform:none !important}
@@ -309,7 +331,7 @@ button{border:none;background:none;font-family:inherit}
 .page-enter{animation:pageIn .45s var(--ease) both}
 @keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-/* ====== HERO SWIPE HINT (mobile only) ====== */
+/* ====== HERO SWIPE HINT ====== */
 .swipe-hint{
   display:none;
   font-family:var(--font-m);font-size:.72rem;letter-spacing:3px;
@@ -607,7 +629,6 @@ button{border:none;background:none;font-family:inherit}
 .form-select option{background:var(--bg-3)}
 .form-textarea{resize:vertical;min-height:90px;line-height:1.6}
 
-/* File upload field (styled like inputs) */
 .file-field{
   display:flex;align-items:center;gap:.7rem;
   background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);
@@ -666,22 +687,20 @@ button{border:none;background:none;font-family:inherit}
 }
 .form-submit p{font-size:.8rem;color:var(--text-dim)}
 
-/* Spinner on submit */
 .btn-spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .submitting .btn-text{display:none}
 .submitting .btn-spinner{display:block}
 
-/* API status toast */
 .toast{
   position:fixed;bottom:2rem;right:2rem;z-index:99999;
   background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r);
   padding:.9rem 1.4rem;font-size:.9rem;color:var(--text);
   box-shadow:0 8px 32px rgba(0,0,0,.5);
-  transform:translateY(80px);opacity:0;transition:all .4s var(--ease);
+  transform:translateY(80px) translateZ(0);opacity:0;transition:all .4s var(--ease);
   max-width:340px;
 }
-.toast.show{transform:translateY(0);opacity:1}
+.toast.show{transform:translateY(0) translateZ(0);opacity:1}
 .toast.success{border-color:rgba(0,200,100,.4);background:rgba(0,200,100,.08)}
 .toast.error{border-color:var(--border-accent);background:rgba(204,27,27,.08)}
 
@@ -766,7 +785,7 @@ button{border:none;background:none;font-family:inherit}
 .success-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem}
 .success-btns .btn{flex:1;min-width:140px;max-width:250px;justify-content:center}
 
-/* ====== CONTROL PANEL (admin) ====== */
+/* ====== CONTROL PANEL ====== */
 .cp-login{
   min-height:100vh;display:flex;align-items:center;justify-content:center;
   padding:3rem;position:relative;z-index:1;
@@ -789,7 +808,6 @@ button{border:none;background:none;font-family:inherit}
 .cp-error{color:var(--accent-light);font-size:.83rem;margin-top:.6rem;display:none}
 .cp-hint{margin-top:1.5rem;font-size:.78rem;color:var(--text-dim)}
 
-/* Dashboard */
 .cp-section{padding:calc(var(--nav-h) + 2rem) 2rem 5rem;max-width:1380px;margin:0 auto;position:relative;z-index:1}
 .cp-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
 .cp-header h1{font-family:var(--font-h);font-size:2.3rem;letter-spacing:3px}
@@ -892,7 +910,6 @@ tr:last-child td{border-bottom:none}
 .footer-bottom{text-align:center;padding-top:1.8rem;border-top:1px solid var(--border);color:var(--text-dim);font-size:.82rem}
 .footer-bottom p{margin:.35rem 0}
 
-/* Footer creator — shimmer animation on the whole line */
 @keyframes creator-shimmer{
   0%  { background-position: -200% center; }
   100%{ background-position:  200% center; }
@@ -926,8 +943,7 @@ tr:last-child td{border-bottom:none}
   text-decoration-color:rgba(210,190,150,.7);
 }
 
-/* ====== BACK BUTTON (inner pages) ====== */
-/* Sits as a normal flow row at the top of each page, full-width strip */
+/* ====== BACK BUTTON ====== */
 .page-back-row{
   display:flex;align-items:center;
   padding:calc(var(--nav-h) + 1.4rem) 3rem .2rem;
@@ -943,19 +959,14 @@ tr:last-child td{border-bottom:none}
 }
 .page-back-btn:hover{ color:var(--accent-light); border-bottom-color:var(--accent); }
 .page-back-btn i{ font-size:.72rem; opacity:.7; }
-@media(max-width:900px){
-  .page-back-row{ padding-left:1.8rem; padding-right:1.8rem; }
-}
-@media(max-width:600px){
-  .page-back-row{ padding:calc(var(--nav-h) + 1rem) 1.2rem .1rem; }
-  .page-back-btn{ font-size:.78rem; }
-}
 
 /* ====== SCROLL REVEAL ====== */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .reveal.revealed{opacity:1;transform:none}
 
-/* ====== RESPONSIVE ====== */
+/* ================================================================
+   RESPONSIVE
+================================================================ */
 @media(max-width:900px){
   .navbar{padding:0 1.4rem}
   .nav-links,.social-icons{display:none}
@@ -969,13 +980,105 @@ tr:last-child td{border-bottom:none}
   .cp-header{flex-direction:column;align-items:flex-start}
   .file-field{flex-wrap:wrap}
   .file-name{flex-basis:100%}
-  /* Segment cards: stay 4-col down to 900px, cards just shrink */
   .seg-checkbox-grid { grid-template-columns: repeat(4, 1fr); gap: .5rem; }
   .seg-checkbox-item { padding: 1.1rem .5rem .9rem; }
   .seg-card-icon { width: 44px; height: 44px; font-size: 1.1rem; }
   .seg-cb-name { font-size: .76rem; }
   .seg-cb-desc { font-size: .58rem; }
+
+  /* ── backdrop-filter OFF on mobile: re-blur on every scroll frame
+     is the single biggest GPU drain on Android Chrome. Replace with
+     solid/near-opaque backgrounds — visually identical on a dark site. ── */
+  .navbar {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(8, 8, 8, 0.96) !important;
+  }
+  .navbar.scrolled {
+    background: rgba(18, 2, 2, 0.98) !important;
+  }
+  .mobile-menu {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(6, 0, 0, 0.98) !important;
+  }
+  .club-logo-btn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(12, 2, 2, 0.92) !important;
+  }
+  .club-popover {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 2, 2, 0.97) !important;
+  }
+  .btn-ghost {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(20, 20, 20, 0.88) !important;
+  }
+  .c-unit {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.9) !important;
+  }
+  .about-quote {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.88) !important;
+  }
+  .seg-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.85) !important;
+  }
+  .seg-card:hover {
+    background: rgba(20, 20, 20, 0.92) !important;
+  }
+  .seg-detail-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.85) !important;
+  }
+  .form-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.9) !important;
+  }
+  .success-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.88) !important;
+  }
+  .cp-login-card,
+  .stat-card,
+  .dist-block,
+  .table-wrap {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.9) !important;
+  }
+  .query-card,
+  .contact-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 15, 15, 0.88) !important;
+  }
+
+  /* Safe-area padding for notched phones */
+  .register-section {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
 }
+
+@media(max-width:680px){
+  .seg-checkbox-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: .55rem;
+  }
+}
+
 @media(max-width:600px){
   :root{--nav-h:60px}
   .hero{padding:calc(var(--nav-h) + 1.5rem) 1.2rem 4rem}
@@ -1009,14 +1112,33 @@ tr:last-child td{border-bottom:none}
   .c-unit small{font-size:.62rem;letter-spacing:1px}
   .footer{padding:3rem 1.2rem 1.5rem}
   .success-card{padding:2.5rem 1.5rem}
-  /* Segment cards: 2-col on mobile */
   .seg-checkbox-grid { grid-template-columns: repeat(2, 1fr); gap: .55rem; }
   .seg-checkbox-item { padding: 1.2rem .7rem 1rem; }
   .seg-card-icon { width: 46px; height: 46px; font-size: 1.15rem; }
   .seg-cb-name { font-size: .8rem; }
   .seg-cb-desc { font-size: .62rem; }
+  .page-back-row{ padding:calc(var(--nav-h) + 1rem) 1.2rem .1rem; }
+  .page-back-btn{ font-size:.78rem; }
 }
-/* Very small screens — tighter cards */
+
+@media(max-width:520px){
+  .form-grid { grid-template-columns: 1fr; gap: .85rem; }
+  .form-group.full { grid-column: 1; }
+  .form-submit { flex-direction: column; align-items: stretch; }
+  .form-submit .btn { width: 100%; justify-content: center; }
+}
+
+@media(max-width:480px){
+  .file-field { flex-wrap: wrap; gap: .5rem; }
+  .file-btn { width: 100%; justify-content: center; }
+  .file-name { flex-basis: 100%; order: 3; }
+  .file-clear { margin-left: auto; }
+}
+
+@media(max-width:400px){
+  .total-amount-box { flex-direction: column; align-items: flex-start; gap: .4rem; }
+}
+
 @media(max-width:380px){
   .seg-checkbox-grid { gap: .4rem; }
   .seg-checkbox-item { padding: 1rem .55rem .85rem; border-radius: 10px; }
@@ -1024,7 +1146,6 @@ tr:last-child td{border-bottom:none}
   .seg-cb-name { font-size: .75rem; }
   .seg-cb-desc { font-size: .58rem; }
 }
-
 
 /* ================================================================
    MULTI-SEGMENT CHECKBOX GRID
@@ -1034,8 +1155,6 @@ tr:last-child td{border-bottom:none}
   grid-template-columns: repeat(4, 1fr);
   gap: .65rem;
 }
-
-/* ── Card base ── */
 .seg-checkbox-item {
   position: relative;
   display: flex;
@@ -1057,8 +1176,6 @@ tr:last-child td{border-bottom:none}
   box-sizing: border-box;
   overflow: hidden;
 }
-
-/* Hide native checkbox — keep in DOM for form logic */
 .seg-checkbox-item input[type=checkbox] {
   position: absolute;
   opacity: 0;
@@ -1066,8 +1183,6 @@ tr:last-child td{border-bottom:none}
   height: 0;
   pointer-events: none;
 }
-
-/* ── Checkmark badge (top-right corner) ── */
 .seg-check-badge {
   position: absolute;
   top: .55rem;
@@ -1087,8 +1202,6 @@ tr:last-child td{border-bottom:none}
   pointer-events: none;
   z-index: 2;
 }
-
-/* ── Icon circle ── */
 .seg-card-icon {
   width: 50px;
   height: 50px;
@@ -1107,8 +1220,6 @@ tr:last-child td{border-bottom:none}
               transform    .22s var(--ease);
   flex-shrink: 0;
 }
-
-/* ── Text ── */
 .seg-cb-name {
   font-family: var(--font-h);
   font-size: .82rem;
@@ -1122,8 +1233,6 @@ tr:last-child td{border-bottom:none}
   color: var(--text-dim);
   line-height: 1.3;
 }
-
-/* ── Hover state ── */
 .seg-checkbox-item:hover {
   border-color: rgba(204,27,27,.45);
   background: rgba(204,27,27,.05);
@@ -1136,13 +1245,10 @@ tr:last-child td{border-bottom:none}
   box-shadow: 0 0 14px rgba(204,27,27,.25);
   transform: scale(1.08);
 }
-
-/* ── Selected state ── */
 .seg-checkbox-item.selected {
   border-color: var(--accent);
   background: rgba(204,27,27,.11);
-  box-shadow: 0 0 0 1px var(--accent),
-              0 10px 30px rgba(204,27,27,.18);
+  box-shadow: 0 0 0 1px var(--accent), 0 10px 30px rgba(204,27,27,.18);
   transform: translateY(-2px);
 }
 .seg-checkbox-item.selected .seg-card-icon {
@@ -1157,7 +1263,6 @@ tr:last-child td{border-bottom:none}
   transform: scale(1) rotate(0deg);
 }
 
-/* Total amount box */
 .total-amount-box {
   display: flex;
   justify-content: space-between;
@@ -1173,8 +1278,6 @@ tr:last-child td{border-bottom:none}
 /* ================================================================
    HOW TO REGISTER PAGE
 ================================================================ */
-
-/* Page header variant for HTR — no reveal flash, aligned with section */
 .htr-page-header {
   max-width: 780px;
   margin: 0 auto;
@@ -1197,7 +1300,6 @@ tr:last-child td{border-bottom:none}
   max-width: 520px;
   margin: 0 auto;
 }
-
 .htr-section {
   max-width: 780px;
   margin: 0 auto;
@@ -1241,7 +1343,6 @@ tr:last-child td{border-bottom:none}
 .htr-cta   { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:3rem; }
 .btn-lg    { padding: 14px 32px; font-size: 1rem; }
 
-/* ====== NAV GUIDE ICON (desktop only — hidden at mobile breakpoint) ====== */
 .nav-guide-icon {
   display: inline-flex !important;
   align-items: center;
@@ -1267,7 +1368,6 @@ tr:last-child td{border-bottom:none}
   transform: scale(1.08);
 }
 
-/* ====== "HOW TO REGISTER?" FORM LINK ====== */
 .htr-form-link {
   display: inline-flex;
   align-items: center;
@@ -1294,6 +1394,7 @@ tr:last-child td{border-bottom:none}
   .htr-step-num { font-size:2rem; min-width:40px; }
   .htr-page-header { padding: 0.8rem 1.2rem 1.5rem; }
   .htr-page-header h1 { font-size: 2.8rem; }
+  .page-back-row{ padding-left:1.8rem; padding-right:1.8rem; }
 }
 
 /* ================================================================
@@ -1336,79 +1437,6 @@ tr:last-child td{border-bottom:none}
 @media (max-width: 600px) {
   .cp-bkash-meta { margin-left: 0; width: 100%; }
 }
-/* ================================================================
-   MERGED FROM responsive-fix.css — additional breakpoints
-   not covered in the original styles.css
-================================================================ */
-
-/* Register section: safe-area aware padding on all phones */
-@media (max-width: 900px) {
-  .register-section {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
-  .seg-checkbox-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: .45rem;
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-
-/* Collapse to 2 columns at 680px — fills gap between 900px and 600px */
-@media (max-width: 680px) {
-  .seg-checkbox-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: .55rem;
-  }
-}
-
-/* Single-column form grid at 520px */
-@media (max-width: 520px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: .85rem;
-  }
-  .form-group.full {
-    grid-column: 1;
-  }
-  .form-submit {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .form-submit .btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* File upload row wraps cleanly at 480px */
-@media (max-width: 480px) {
-  .file-field {
-    flex-wrap: wrap;
-    gap: .5rem;
-  }
-  .file-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  .file-name {
-    flex-basis: 100%;
-    order: 3;
-  }
-  .file-clear {
-    margin-left: auto;
-  }
-}
-
-/* Total amount box stacks at 400px */
-@media (max-width: 400px) {
-  .total-amount-box {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .4rem;
-  }
-}
 
 .quiz-offline-notice {
   display: none;
@@ -1425,14 +1453,13 @@ tr:last-child td{border-bottom:none}
   margin-top: .4rem;
   line-height: 1.4;
 }
-.quiz-offline-notice.visible {
-  display: flex;
-}
+.quiz-offline-notice.visible { display: flex; }
 .quiz-offline-notice i {
   color: #ffb400;
   font-size: .72rem;
   flex-shrink: 0;
 }
+
 /* ================================================================
    SINGING CATEGORY AUTO-CHIP
 ================================================================ */
@@ -1492,7 +1519,6 @@ tr:last-child td{border-bottom:none}
   font-size: 1.1rem;
   flex-shrink: 0;
 }
-
 .mic-cat-warn {
   display: flex;
   align-items: flex-start;
@@ -1514,6 +1540,7 @@ tr:last-child td{border-bottom:none}
   color: #ffb400;
 }
 .mic-cat-warn strong { color: var(--text); }
+
 /* ================================================================
    SUBMISSION GROUP NOTICE — success page
 ================================================================ */
@@ -1548,4 +1575,55 @@ tr:last-child td{border-bottom:none}
   color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
+}
+
+/* ================================================================
+   PREFERS-REDUCED-MOTION
+   Respect OS accessibility setting. Elements stay visible —
+   just no animation for users who opted out system-wide.
+================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero-slide.active.go-right,
+  .hero-slide.active.go-left {
+    animation: none !important;
+    clip-path: none !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .reveal.revealed {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .seg-card,
+  .seg-detail-card {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  #particles-canvas { display: none !important; }
+  #cursor, #cursor-ring, #cursor-nav-hint { display: none !important; }
+  .swipe-hint { animation: none !important; opacity: 0.3 !important; }
+  #ls-logo-wrap { animation: none !important; opacity: 1 !important; }
+  .form-card::before { animation: none !important; background-position: 0% !important; }
+  .club-logo-pulse { animation: none !important; }
+  .footer-creator {
+    animation: none !important;
+    background: none !important;
+    -webkit-text-fill-color: rgba(160,160,160,0.5) !important;
+    color: rgba(160,160,160,0.5) !important;
+  }
+  .footer-creator a {
+    -webkit-text-fill-color: rgba(180,160,120,0.6) !important;
+  }
 }
