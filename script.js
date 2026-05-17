@@ -183,7 +183,8 @@ if (!IS_TOUCH) {
       kind: k < 0.6 ? 0 : k < 0.85 ? 1 : 2
     };
   }
-  const pts = Array.from({ length: 150 }, mkPt);
+  const PARTICLE_COUNT = IS_TOUCH ? 100 : 150;
+  const pts = Array.from({ length: PARTICLE_COUNT }, mkPt);
 
   function drawPt(p) {
     const col = p.gold ? "#C9A84C" : "#CC1B1B";
